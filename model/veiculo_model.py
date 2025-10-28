@@ -1,5 +1,3 @@
-import mysql.connector
-
 class Veiculo:
     def __init__(self, marca, modelo, ano, placa):
         self.marca = marca
@@ -28,36 +26,66 @@ class VeiculoRepository:
             )
         """)
         self.conexao.commit()
+        cursor.close()
 
     def salvar(self, veiculo):
-        cursor = self.conexao.cursor()
-        sql = "INSERT INTO veiculos (marca, modelo, ano, placa) VALUES (%s, %s, %s, %s)"
-        valores = (veiculo.marca, veiculo.modelo, veiculo.ano, veiculo.placa)
-        cursor.execute(sql, valores)
-        self.conexao.commit()
+        try:
+            cursor = self.conexao.cursor()
+            sql = "INSERT INTO veiculos (marca, modelo, ano, placa) VALUES (%s, %s, %s, %s)"
+            valores = (veiculo.marca, veiculo.modelo, veiculo.ano, veiculo.placa)
+            cursor.execute(sql, valores)
+            self.conexao.commit()
+        except Exception as e:
+            print(f"Erro ao salvar veículo: {e}")
+        finally:
+            cursor.close()
 
     def listar(self):
-        cursor = self.conexao.cursor()
-        cursor.execute("SELECT marca, modelo, ano, placa FROM veiculos")
-        resultados = cursor.fetchall()
-        return [Veiculo(*r) for r in resultados]
+        try:
+            cursor = self.conexao.cursor()
+            cursor.execute("SELECT marca, modelo, ano, placa FROM veiculos")
+            resultados = cursor.fetchall()
+            return [Veiculo(*r) for r in resultados]
+        except Exception as e:
+            print(f"Erro ao listar veículos: {e}")
+            return []
+        finally:
+            cursor.close()
 
     def buscar_por_placa(self, placa):
-        cursor = self.conexao.cursor()
-        cursor.execute("SELECT marca, modelo, ano, placa FROM veiculos WHERE placa = %s", (placa,))
-        resultado = cursor.fetchone()
-        return Veiculo(*resultado) if resultado else None
+        try:
+            cursor = self.conexao.cursor()
+            cursor.execute("SELECT marca, modelo, ano, placa FROM veiculos WHERE placa = %s", (placa,))
+            resultado = cursor.fetchone()
+            return Veiculo(*resultado) if resultado else None
+        except Exception as e:
+            print(f"Erro ao buscar veículo: {e}")
+            return None
+        finally:
+            cursor.close()
 
     def editar(self, placa, nova_marca, novo_modelo, novo_ano):
-        cursor = self.conexao.cursor()
-        sql = "UPDATE veiculos SET marca = %s, modelo = %s, ano = %s WHERE placa = %s"
-        valores = (nova_marca, novo_modelo, novo_ano, placa)
-        cursor.execute(sql, valores)
-        self.conexao.commit()
-        return cursor.rowcount > 0
+        try:
+            cursor = self.conexao.cursor()
+            sql = "UPDATE veiculos SET marca = %s, modelo = %s, ano = %s WHERE placa = %s"
+            valores = (nova_marca, novo_modelo, novo_ano, placa)
+            cursor.execute(sql, valores)
+            self.conexao.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Erro ao editar veículo: {e}")
+            return False
+        finally:
+            cursor.close()
 
     def excluir(self, placa):
-        cursor = self.conexao.cursor()
-        cursor.execute("DELETE FROM veiculos WHERE placa = %s", (placa,))
-        self.conexao.commit()
-        return cursor.rowcount > 0
+        try:
+            cursor = self.conexao.cursor()
+            cursor.execute("DELETE FROM veiculos WHERE placa = %s", (placa,))
+            self.conexao.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Erro ao excluir veículo: {e}")
+            return False
+        finally:
+            cursor.close()
