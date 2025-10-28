@@ -1,4 +1,4 @@
-Explicação:
+Explicação para a Turma de Programador de Sistemas 283:
 
 model/veiculo_model.py: Define a classe Veiculo, com atributos como marca, modelo, ano, placa, etc. Pode incluir métodos para salvar, editar, excluir e listar veículos.
 
